@@ -1,0 +1,78 @@
+# depslib dependency file v1.0
+1442744757 source:/home/viet/As _1/mp1_assignment/Application.cpp
+	"Application.h"
+
+1420757300 /home/viet/As _1/mp1_assignment/Application.h
+	"stdincludes.h"
+	"MP1Node.h"
+	"Log.h"
+	"Params.h"
+	"Member.h"
+	"EmulNet.h"
+	"Queue.h"
+
+1415285296 /home/viet/As _1/mp1_assignment/stdincludes.h
+	<stdio.h>
+	<math.h>
+	<string.h>
+	<stdlib.h>
+	<assert.h>
+	<time.h>
+	<stdarg.h>
+	<unistd.h>
+	<fcntl.h>
+	<execinfo.h>
+	<signal.h>
+	<iostream>
+	<vector>
+	<map>
+	<string>
+	<algorithm>
+	<queue>
+	<fstream>
+
+1442755440 /home/viet/As _1/mp1_assignment/MP1Node.h
+	"stdincludes.h"
+	"Log.h"
+	"Params.h"
+	"Member.h"
+	"EmulNet.h"
+	"Queue.h"
+
+1419913668 /home/viet/As _1/mp1_assignment/Log.h
+	"stdincludes.h"
+	"Params.h"
+	"Member.h"
+
+1419987746 /home/viet/As _1/mp1_assignment/Params.h
+	"stdincludes.h"
+	"Params.h"
+	"Member.h"
+
+1443026744 /home/viet/As _1/mp1_assignment/Member.h
+	"stdincludes.h"
+
+1420758066 /home/viet/As _1/mp1_assignment/EmulNet.h
+	"stdincludes.h"
+	"Params.h"
+	"Member.h"
+
+1420758096 /home/viet/As _1/mp1_assignment/Queue.h
+	"stdincludes.h"
+	"Member.h"
+
+1415267712 source:/home/viet/As _1/mp1_assignment/EmulNet.cpp
+	"EmulNet.h"
+
+1424411862 source:/home/viet/As _1/mp1_assignment/Log.cpp
+	"Log.h"
+
+1424146750 source:/home/viet/As _1/mp1_assignment/Member.cpp
+	"Member.h"
+
+1420758190 source:/home/viet/As _1/mp1_assignment/Params.cpp
+	"Params.h"
+
+1443067609 source:/home/viet/As _1/mp1_assignment/MP1Node.cpp
+	"MP1Node.h"
+
