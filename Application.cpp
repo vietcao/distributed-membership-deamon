@@ -184,6 +184,8 @@ void Application::fail() {
 		log->LOG(&mp1[removed]->getMemberNode()->addr, "Node failed at time=%d", par->getcurrtime());
 		#endif
 		mp1[removed]->getMemberNode()->bFailed = true;
+		// V. Cao
+		cout << "                           :  MM" << endl;
 	}
 	else if( par->getcurrtime() == 100 ) {
 		removed = rand() % par->EN_GPSZ/2;
@@ -192,6 +194,7 @@ void Application::fail() {
 			log->LOG(&mp1[i]->getMemberNode()->addr, "Node failed at time = %d", par->getcurrtime());
 			#endif
 			mp1[i]->getMemberNode()->bFailed = true;
+			cout << "                           :  MM" << endl;
 		}
 	}
 

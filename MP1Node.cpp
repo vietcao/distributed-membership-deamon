@@ -269,6 +269,7 @@ bool MP1Node::recvCallBack(void *env, char *data, int size ) {
                   ///cout << memberNode->addr.getAddress() << "already recvice JOINREP mgs"<< endl;
                   break;
 		case GOSSIP:
+                  {
                   if(  !memberNode->inGroup ) break;
                   //cout << sizeof(data)<<"       "<< sizeof(MessageHdr)<< endl;
                   vector<MemberListEntry> Comming_list;
@@ -354,9 +355,52 @@ bool MP1Node::recvCallBack(void *env, char *data, int size ) {
                   out:
                   //cout << memberNode->addr.getAddress() << " have "<< memberNode->memberList.size() << " entry "<< endl;
                   break;
-	}
-}
+                  }
+            /*
+            case FAILDETEC:
+                  Address* fail_addr = (Address *)(data + sizeof(MessageHdr));
+                  for(int i = 0; i < memberNode->memberList.size(); i++ )
+                  {
+                        vector<MemberListEntry>::iterator it = memberNode->memberList.begin() + i;
+                        if( it->getid() == fail_addr->getId())
+                        {
+                              log->logNodeRemove(&memberNode->addr, fail_addr); // print removed to log
+                              if( i != 0 )
+                                    memberNode->memberList.erase(it);
+                              //it->settimestamp( par->getcurrtime() - TFAIL - 1);
+                              //it->setheartbeat(-1);
+                              MessageHdr* msg;
+                              size_t msgsize = sizeof(MessageHdr) + sizeof(Address);
+                              msg = (MessageHdr *) malloc(msgsize * sizeof(char));
+                              msg->msgType = FAILDETEC;
+                              memcpy((char *)msg + sizeof(MessageHdr), fail_addr, sizeof(Address));
 
+                              int vector_size = memberNode->memberList.size();
+                              int revciver_1st, revciver_2sd; // send 1st node in first hafl list and 2sd node to second hatf, the midle node may be double send
+                              revciver_1st = random() % vector_size/2 + 1; // +1 to avoid send to itself
+                              revciver_2sd = revciver_1st + vector_size/2;
+
+                              if( revciver_1st < vector_size)
+                              {
+                                    Address* recv_1st_addr = new Address(to_string(memberNode->memberList.at(revciver_1st).getid())+":"+to_string(memberNode->memberList.at(revciver_1st).getport()));
+
+                                    emulNet->ENsend(&memberNode->addr, recv_1st_addr, (char *)msg, (int )msgsize);
+                                   // cout << revciver_1st << endl;
+                                    //cout << memberNode->addr.getAddress() << " send GOSSIP to : " << memberNode->memberList.at(revciver_1st).getid() <<" with size "<< vector_size << endl;
+                              }
+                              if( revciver_2sd < vector_size)
+                              {
+                                    Address* recv_2sd_addr = new Address(to_string(memberNode->memberList.at(revciver_2sd).getid())+":"+to_string(memberNode->memberList.at(revciver_2sd).getport()));
+                                    emulNet->ENsend(&memberNode->addr, recv_2sd_addr, (char *)msg, (int )msgsize);
+                                    //cout << revciver_2sd << endl;
+                                   // cout << memberNode->addr.getAddress() << " send GOSSIP to : " << memberNode->memberList.at(revciver_2sd).getid() <<" with size "<< vector_size << endl;
+                              }
+                        }
+                  }
+                  break;
+                  */
+      }
+}
 /**
  * FUNCTION NAME: nodeLoopOps
  *
@@ -372,10 +416,11 @@ void MP1Node::nodeLoopOps() {
       memberNode->heartbeat++;
       vector<MemberListEntry>::iterator it = memberNode->memberList.begin();
       it->setheartbeat(memberNode->heartbeat);
+
       for(int i = 1 ; i < memberNode->memberList.size(); i++)
       {
             MemberListEntry entry = memberNode->memberList.at(i);
-            if( (par->getcurrtime() - entry.gettimestamp()) > TFAIL)
+            if( (par->getcurrtime() - entry.gettimestamp()) > TFAIL )
             {
                   //cout << " notice failed happpen" << endl;
                   //cout <<" Heartbeat befor test :           " <<entry.getheartbeat() << endl;
@@ -383,11 +428,48 @@ void MP1Node::nodeLoopOps() {
                   {
                         //cout << "               remove node " << endl;
                         MemberListEntry remove_node = memberNode->memberList.at(i);
+                        //if( i != 0){
                         memberNode->memberList.erase(memberNode->memberList.begin()+ i);
+                       // }
+
                         Address* remove_addr = new Address(to_string(remove_node.getid())+ ":"+ to_string(remove_node.getport()));
+                        /*
+                        MessageHdr* msg;
+                        size_t msgsize = sizeof(MessageHdr) + sizeof(Address);
+                        msg = (MessageHdr *) malloc(msgsize * sizeof(char));
+                        msg->msgType = FAILDETEC;
+                        memcpy((char *)msg + sizeof(MessageHdr), remove_addr, sizeof(Address));
+
+                        int vector_size = memberNode->memberList.size();
+                        int revciver_1st, revciver_2sd; // send 1st node in first hafl list and 2sd node to second hatf, the midle node may be double send
+                        revciver_1st = random() % vector_size/2 + 1; // +1 to avoid send to itself
+                        revciver_2sd = revciver_1st + vector_size/2;
+
+                        if( revciver_1st < vector_size)
+                        {
+                              Address* recv_1st_addr = new Address(to_string(memberNode->memberList.at(revciver_1st).getid())+":"+to_string(memberNode->memberList.at(revciver_1st).getport()));
+
+                              emulNet->ENsend(&memberNode->addr, recv_1st_addr, (char *)msg, (int )msgsize);
+                             // cout << revciver_1st << endl;
+                              //cout << memberNode->addr.getAddress() << " send GOSSIP to : " << memberNode->memberList.at(revciver_1st).getid() <<" with size "<< vector_size << endl;
+                        }
+                        if( revciver_2sd < vector_size)
+                        {
+                              Address* recv_2sd_addr = new Address(to_string(memberNode->memberList.at(revciver_2sd).getid())+":"+to_string(memberNode->memberList.at(revciver_2sd).getport()));
+                              emulNet->ENsend(&memberNode->addr, recv_2sd_addr, (char *)msg, (int )msgsize);
+                              //cout << revciver_2sd << endl;
+                             // cout << memberNode->addr.getAddress() << " send GOSSIP to : " << memberNode->memberList.at(revciver_2sd).getid() <<" with size "<< vector_size << endl;
+
+                        }
+                        */
+
 
                         log->logNodeRemove(&memberNode->addr, remove_addr);
-                        log->LOG( remove_addr, "Node failed at time = %d", par->getcurrtime());
+                        /*
+                        if( i != 0){
+                              log->log( remove_addr, "node failed at time = %d", par->getcurrtime());
+                        }
+                        */
                   }
                   else
                   {

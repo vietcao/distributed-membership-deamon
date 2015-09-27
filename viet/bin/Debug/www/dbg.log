@@ -1,0 +1,12 @@
+ 3.0.0.0:0 [7] Node failed at time = 7
+ 1.0.0.0:0 [36] Node 3.0.0.0:0 removed at time 36
+ 2.0.0.0:0 [36] Node 3.0.0.0:0 removed at time 36
+ 3.0.0.0:0 [36] Node 3.0.0.0:0 removed at time 36
+ 4.0.0.0:0 [36] Node 3.0.0.0:0 removed at time 36
+ 5.0.0.0:0 [36] Node 3.0.0.0:0 removed at time 36
+ 6.0.0.0:0 [36] Node 3.0.0.0:0 removed at time 36
+ 7.0.0.0:0 [36] Node 3.0.0.0:0 removed at time 36
+ 8.0.0.0:0 [36] Node 3.0.0.0:0 removed at time 36
+ 9.0.0.0:0 [36] Node 3.0.0.0:0 removed at time 36
+
+

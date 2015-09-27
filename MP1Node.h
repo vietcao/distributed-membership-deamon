@@ -33,6 +33,7 @@ enum MsgTypes{
     JOINREQ,
     JOINREP,
     GOSSIP,
+    //FAILDETEC,
     DUMMYLASTMSGTYPE
 };
 
