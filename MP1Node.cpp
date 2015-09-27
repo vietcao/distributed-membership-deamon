@@ -281,7 +281,7 @@ bool MP1Node::recvCallBack(void *env, char *data, int size ) {
                   }
                   //vector<MemberListEntry> Comming_list = (vector<MemberListEntry> )*(data + sizeof(MessageHdr) );
 
-                  cout << "Node "<< memberNode->addr.getAddress() << " was recvied GOSSIP with size :  "<< Comming_list.size() << " when have size"<< memberNode->memberList.size() << endl;
+                  //cout << "Node "<< memberNode->addr.getAddress() << " was recvied GOSSIP with size :  "<< Comming_list.size() << " when have size"<< memberNode->memberList.size() << endl;
 
                   // search send node on current list and update it no matter it marked falied or not.
                   MemberListEntry send_node = Comming_list.front();
@@ -304,7 +304,7 @@ bool MP1Node::recvCallBack(void *env, char *data, int size ) {
                   }
                   if( i >= (int)memberNode->memberList.size() )
                   {
-                         cout <<"                                                                       " << i  << endl;
+                        // cout <<"                                                                       " << i  << endl;
                         memberNode->memberList.push_back(send_node);
                         add_addr = new Address(to_string(send_node.getid()) + ":"+ to_string(send_node.getport()));
                         log->logNodeAdd(&memberNode->addr, add_addr );
@@ -314,11 +314,12 @@ bool MP1Node::recvCallBack(void *env, char *data, int size ) {
                  // cout << Comming_list.size() << " comming's size !"<< endl;
 
                   for(int i = 1; i < Comming_list.size();  i++)
-                  my_label:
+                  //my_label:
                   {
-                        cout << "can   i   = "<< i << endl;
+                        //cout << "can   i   = "<< i << endl;
                         MemberListEntry new_entry = Comming_list.at(i);
-                        for(int j = 0 ; j < memberNode->memberList.size(); j++)
+                        int j;
+                        for( j = 0 ; j < memberNode->memberList.size(); j++)
                         {
                               //MemberListEntry old_entry = memberNode->memberList.at(j);
                               vector<MemberListEntry>::iterator it = memberNode->memberList.begin() + j;
@@ -336,23 +337,30 @@ bool MP1Node::recvCallBack(void *env, char *data, int size ) {
 
                                           }
                                     }
+                                    break;
                                     //cout << "                                : "<< i << endl;
-                                    i++;
-                                    if( i < Comming_list.size() )   goto my_label;
-                                    else goto out;
+                                    //i++;
+                                    //if( i < Comming_list.size() )   goto my_label;
+                                    //else goto out;
                               }
 
 
                         }
                          // if old list don't have entry in new list then add new_entry
-                        memberNode->memberList.push_back(new_entry);
-                        add_addr = new Address(to_string(new_entry.getid()) + ":"+ to_string(new_entry.getport()));
-                        log->logNodeAdd(&memberNode->addr, add_addr );
-                        cout << "push back "<< new_entry.getid() << " : at orginal node "<< memberNode->memberList.at(0).getid() << endl;
+                        if( j >= memberNode->memberList.size())
+                        {
+                              if( new_entry.getheartbeat() >= 0)
+                              {
+                                    memberNode->memberList.push_back(new_entry);
+                                    add_addr = new Address(to_string(new_entry.getid()) + ":"+ to_string(new_entry.getport()));
+                                    log->logNodeAdd(&memberNode->addr, add_addr );
+                              }
+                        //cout << "push back "<< new_entry.getid() << " : at orginal node "<< memberNode->memberList.at(0).getid() << endl;
+                        }
 
 
                   }
-                  out:
+                  //out:
                   //cout << memberNode->addr.getAddress() << " have "<< memberNode->memberList.size() << " entry "<< endl;
                   break;
                   }
@@ -420,7 +428,7 @@ void MP1Node::nodeLoopOps() {
       for(int i = 1 ; i < memberNode->memberList.size(); i++)
       {
             MemberListEntry entry = memberNode->memberList.at(i);
-            if( (par->getcurrtime() - entry.gettimestamp()) > TFAIL )
+            if( (par->getcurrtime() - entry.gettimestamp()) > TREMOVE )
             {
                   //cout << " notice failed happpen" << endl;
                   //cout <<" Heartbeat befor test :           " <<entry.getheartbeat() << endl;
@@ -429,7 +437,9 @@ void MP1Node::nodeLoopOps() {
                         //cout << "               remove node " << endl;
                         MemberListEntry remove_node = memberNode->memberList.at(i);
                         //if( i != 0){
+                        cout << "Size before : "<< memberNode->memberList.size() << endl;
                         memberNode->memberList.erase(memberNode->memberList.begin()+ i);
+                        cout << "Size after : "<< memberNode->memberList.size() << endl;
                        // }
 
                         Address* remove_addr = new Address(to_string(remove_node.getid())+ ":"+ to_string(remove_node.getport()));
@@ -465,6 +475,7 @@ void MP1Node::nodeLoopOps() {
 
 
                         log->logNodeRemove(&memberNode->addr, remove_addr);
+                        cout << remove_addr->getAddress() << "  and size : " << memberNode->memberList.size() << " at node " << memberNode->addr.getAddress() << " at time  "<< par->getcurrtime() << endl;
                         /*
                         if( i != 0){
                               log->log( remove_addr, "node failed at time = %d", par->getcurrtime());
@@ -479,9 +490,10 @@ void MP1Node::nodeLoopOps() {
 
 
                         it->setheartbeat(0 - entry.getheartbeat());
+                        it->settimestamp( par->getcurrtime());
                         //it.setheartbeat(0 - entry.getheartbeat());
-                        cout << "marked was fail and heartbeat set to : "<< entry.getheartbeat() << endl;
-                        cout << "After set heartbeat :      "<< entry.getheartbeat() << endl;
+                        //cout << "marked was fail and heartbeat set to : "<< entry.getheartbeat() << endl;
+                        //cout << "After set heartbeat :      "<< entry.getheartbeat() << endl;
                   }
             }
       }
@@ -514,15 +526,15 @@ void MP1Node::nodeLoopOps() {
             Address* recv_1st_addr = new Address(to_string(memberNode->memberList.at(revciver_1st).getid())+":"+to_string(memberNode->memberList.at(revciver_1st).getport()));
 
             emulNet->ENsend(&memberNode->addr, recv_1st_addr, (char *)msg, (int )msgsize);
-            cout << revciver_1st << endl;
-            cout << memberNode->addr.getAddress() << " send GOSSIP to : " << memberNode->memberList.at(revciver_1st).getid() <<" with size "<< vector_size << endl;
+            //cout << revciver_1st << endl;
+            //cout << memberNode->addr.getAddress() << " send GOSSIP to : " << memberNode->memberList.at(revciver_1st).getid() <<" with size "<< vector_size << endl;
       }
       if( revciver_2sd < vector_size)
       {
             Address* recv_2sd_addr = new Address(to_string(memberNode->memberList.at(revciver_2sd).getid())+":"+to_string(memberNode->memberList.at(revciver_2sd).getport()));
             emulNet->ENsend(&memberNode->addr, recv_2sd_addr, (char *)msg, (int )msgsize);
-            cout << revciver_2sd << endl;
-            cout << memberNode->addr.getAddress() << " send GOSSIP to : " << memberNode->memberList.at(revciver_2sd).getid() <<" with size "<< vector_size << endl;
+            //cout << revciver_2sd << endl;
+            //cout << memberNode->addr.getAddress() << " send GOSSIP to : " << memberNode->memberList.at(revciver_2sd).getid() <<" with size "<< vector_size << endl;
 
       }
     return;
