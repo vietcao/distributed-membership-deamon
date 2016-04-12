@@ -129,10 +129,13 @@ int MP1Node::introduceSelfToGroup(Address *joinaddr) {
         log->LOG(&memberNode->addr, "Starting up group...");
 #endif
         memberNode->inGroup = true;
-
+        int id = 0;
+        memcpy(&id, &memberNode->addr.addr[0], sizeof(int));
+        short port;
+        memcpy(&port, &memberNode->addr.addr[4], sizeof(short));
         MemberListEntry* own_node = new MemberListEntry();
-        own_node->setid(memberNode->addr.getId());
-        own_node->setport(memberNode->addr.getPort());
+        own_node->setid(id);
+        own_node->setport(port);
         own_node->setheartbeat(memberNode->heartbeat);
         memberNode->memberList.push_back(*own_node);
 
@@ -146,11 +149,15 @@ int MP1Node::introduceSelfToGroup(Address *joinaddr) {
         memcpy((char *)(msg+1), &memberNode->addr.addr, sizeof(memberNode->addr.addr));
         memcpy((char *)(msg+1) + 1 + sizeof(memberNode->addr.addr), &memberNode->heartbeat, sizeof(long));
 
-            MemberListEntry* own_node = new MemberListEntry();
-            own_node->setid(memberNode->addr.getId());
-            own_node->setport(memberNode->addr.getPort());
-            own_node->setheartbeat(memberNode->heartbeat);
-            memberNode->memberList.push_back(*own_node);
+        int id = 0;
+        memcpy(&id, &memberNode->addr.addr[0], sizeof(int));
+        short port;
+        memcpy(&port, &memberNode->addr.addr[4], sizeof(short));
+        MemberListEntry* own_node = new MemberListEntry();
+        own_node->setid(id);
+        own_node->setport(port);
+        own_node->setheartbeat(memberNode->heartbeat);
+        memberNode->memberList.push_back(*own_node);
 
 #ifdef DEBUGLOG
         sprintf(s, "Trying to join...");
